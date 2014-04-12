@@ -71,6 +71,12 @@ int main(void){
 	*/
 		
 	verletengine(state, past, N, L);
+	for(int i=0; i<N; i++){
+		free(state[i]);
+		free(past[i]);
+		}
+	free(state);
+	free(past);
 	return 0;
 	}
 void verletengine(double **state, double **past, int N, double L){
@@ -128,7 +134,7 @@ void verletengine(double **state, double **past, int N, double L){
 					state[i][j] = next;
 				}
 			}
-		t = t+deltat;
+		t += deltat;
 		if(step%100 ==99)
 		printf("%f %f %f %f %f \n",t,state[testPart][0],state[testPart][1],state[testPart][2],vTotal);
 		
