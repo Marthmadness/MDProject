@@ -30,13 +30,13 @@ int main(void){
 	//cube stuff
 	for(int i = 0; i<N; i++){	
 		double ran = 0;//for now keep velocity 0
-		state[i][0] = (i%3)*L/3.0 + (ran*L*(rand()-0.5)/(double)RAND_MAX);
-		state[i][1] = ((i/3)%3)*L/3.0+ (ran*(rand()-0.5)/(double)RAND_MAX);
-		state[i][2] = ((i/9)%3)*L/3.0+ (ran*(rand()-0.5)/(double)RAND_MAX);
+		past[i][0] = (i%N_core)*L/N_core;
+		past[i][1] = ((i/N_core)%N_core)*L/N_core;
+		past[i][2] = ((i/(N_core*N_core))%N_core)*L/N_core;
 		//in our case, start with slightly randomized velocity, nothing too fancy
-		past[i][0] = (i%3)*L/3.0;
-		past[i][1] = ((i/3)%3)*L/3.0;
-		past[i][2] = ((i/9)%3)*L/3.0;
+		state[i][0] = past[i][0]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
+		state[i][1] = past[i][1]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
+		state[i][2] = past[i][2]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
 		}
 	printf("%f %f %f %f \n",0.00,state[testPart][0],state[testPart][1],state[testPart][2]);
 
