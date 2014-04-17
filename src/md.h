@@ -3,5 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-//prototyping
+/*
+ * verletengine
+ * Does stuff
+ */
 void verletengine(double **state, double **past, int N, double L);
