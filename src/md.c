@@ -1,8 +1,8 @@
 #include "md.h"
+#include "verlet.h"
 
 //initializing stuff
-int main(void){
-	
+int main(){	
 	//cube case
 	double L = 100; //length of one side of the box
 	int N_core = 3; // number of particles per side in a cubic lattice thing.
@@ -74,65 +74,3 @@ int main(void){
 	free(past);
 	return 0;
 	}
-void verletengine(double **state, double **past, int N, double L){
-// set conditions
-
-	double t = 0; //initial time is 0
-	double deltat = 0.001;// timestep
-	int steps = 10000; //number of steps to simulate
-	double mass = 1.0;
-	srand(time(NULL));
-	int testPart = 0;
-
-	//begin the loop of the simulation
-	for(int step=0; step<steps; step++){
-		//zero out forces
-		for(int i = 0; i<N; i++){	
-			for(int j = 3; j<6; j++){
-				state[i][j] = 0;
-				}
-			}
-		//start calculating forces
-		double epsilon = 1.0;
-		double sigma = 1.0;
-		for(int i = 0; i < N-1; i++){//loop over all pairs
-			for(int j=i+1; j<N; j++){
-					double rij[3];
-					double rij2 = 0;
-					for(int k=0; k<3; k++){
-						rij[k] = state[j][k] - state[i][k]; 
-						if(abs(rij[k]) > 0.5*L){
-							rij[k] = (L - abs(rij[k]))*((rij[k] < 0) - (rij[k] > 0));//minimum image convention, requires that the particles are inside the cube
-						}
-						rij2 += rij[k]*rij[k];
-					}
-					double force = -24/(rij2) * (2*(pow(sigma,12)/(pow(rij2,6))) - (pow(sigma,6)/pow(rij2,3)));
-					//now update each component of the force
-					for(int k=3; k<6; k++){
-						state[i][k] += force*rij[k-3];
-						state[j][k] += -state[i][k];//newton's 3rd law
-					}
-				}
-			}
-		//now integrate with respect to time! Verlet style!
-		double vTotal = 0.0;
-		for(int i=0; i<N; i++){
-				for(int j=0; j<3; j++){
-					double next = 2*state[i][j] - past[i][j] + deltat*deltat*state[i][j+3]/mass;
-					if(next<0 || next>L){
-						next = next - L*floor(next/L); //enforce pbc
-					}
-					if(j==1){
-						vTotal += next-state[i][j];
-					}
-					past[i][j] = state[i][j];
-					state[i][j] = next;
-				}
-			}
-		t += deltat;
-		if(step%100 ==99)
-		printf("%f %f %f %f %f \n",t,state[testPart][0],state[testPart][1],state[testPart][2],vTotal);
-		
-		
-		}
-}
