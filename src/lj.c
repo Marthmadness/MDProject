@@ -18,5 +18,7 @@ void lj(double **state, int N, double L, double epsilon, double sigma){
 				state[j][k] += -state[i][k];//newton's 3rd law
 			}
 		}
+
 	}
+	//printf("%lf %lf %lf \n", state[1][3], state[1][4], state[1][5]);
 }

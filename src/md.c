@@ -1,14 +1,39 @@
 #include "md.h"
 #include "verlet.h"
 
+#define INPUT
 //initializing stuff
 int main(){	
-	//cube case
+	#ifdef CUBE
 	double L = 100; //length of one side of the box
 	int N_core = 3; // number of particles per side in a cubic lattice thing.
 	int N = N_core*N_core*N_core;
 	int testPart = 0;
-	
+	#endif
+	#ifdef INPUT
+	FILE *fp;
+	fp = fopen("coords_1_kj.dat","r");
+	if(fp==NULL){
+		perror("Failed to open file");
+		return -1;
+	}
+	char buff[100];
+	fgets(buff, 100, fp);
+	fgets(buff, 100, fp);
+	fgets(buff, 100, fp); 
+	int N;
+	fscanf(fp, "%d", &N);
+	fgets(buff, 100, fp);
+	fgets(buff, 100, fp);
+	double xmin, xmax;
+	fscanf(fp, "%lf %lf", &xmin, &xmax);
+	fgets(buff, 100, fp);
+	double L = xmax-xmin;
+	printf("%d \n", N);
+	printf("%lf \n", L);
+	fgets(buff, 100, fp);
+	fgets(buff, 100, fp);
+	#endif
 	double **state;
 	state = malloc(N*sizeof(double *));
 	double **past;
@@ -17,12 +42,32 @@ int main(){
 	for(int i=0; i<N; i++){
 		state[i] = malloc(6*sizeof(double));
 		past[i] = malloc(3*sizeof(double));
-		}
+	}
 	
 	int type[N];//for later stuff if I feel like it
 	//initialize positions on grid
-
+	#ifdef INPUT
+	for(int i = 0; i<N; i++){
+		int trash;
+		double trash2;
+		fgets(buff, 100, fp);//advance buffer
+		fscanf(fp, "%d %d %d %lf %lf %lf %lf %lf %lf",&trash, &trash, &trash, &state[i][0], &state[i][1], &state[i][2],&trash2, &trash2, &trash2);
+		for(int j = 0; j<3; j++){
+			if(state[i][j]<0 || state[i][j]>=L){
+				state[i][j] = state[i][j] - L*floor(state[i][j]/L); //enforce pbc
+			}
+		}
+		past[i][0] = state[i][0];
+		past[i][1] = state[i][1];
+		past[i][2] = state[i][2];
+	}
+	int testPart = N-1;
+	fclose(fp);
+	#endif
+	
+	#ifdef CUBE
 	//cube stuff
+	
 	for(int i = 0; i<N; i++){	
 		double ran = 0;//for now keep velocity 0
 		past[i][0] = (i%N_core)*L/N_core;
@@ -32,38 +77,9 @@ int main(){
 		state[i][0] = past[i][0]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
 		state[i][1] = past[i][1]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
 		state[i][2] = past[i][2]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
-		}
-	printf("%f %f %f %f \n",0.00,state[testPart][0],state[testPart][1],state[testPart][2]);
-
-
-	/*
-	//for pair interaction
-	state[0][1] = L/32;
-	state[0][2] = 0;
-	state[0][3] = 0;
-	state[0][4] = 0;
-	state[0][5] = 0;
-	state[0][0] = 0;
-	state[1][1] = 31*L/32.0;
-	state[1][2] = 0;
-	state[1][3] = 0;
-	state[1][4] = 0;
-	state[1][5] = 0;
-	state[1][0] = 0;
-	past[0][1] = L/32;
-	past[0][2] = 0;
-	past[0][3] = 0;
-	past[0][4] = 0;
-	past[0][5] = 0;
-	past[0][0] = 0;
-	past[1][1] = 31*L/32.0;
-	past[1][2] = 0;
-	past[1][3] = 0;
-	past[1][4] = 0;
-	past[1][5] = 0;
-	past[1][0] = 0;
-	printf("%f %f %f %f \n",t,state[testPart][0],state[testPart][1],state[testPart][2]);
-	*/
+	}
+	#endif	
+	printf("%lf %lf %lf %lf \n",0.00,state[testPart][0],state[testPart][1],state[testPart][2]);
 		
 	verletengine(state, past, N, L);
 	for(int i=0; i<N; i++){
