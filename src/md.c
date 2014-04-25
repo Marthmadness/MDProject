@@ -1,14 +1,14 @@
 #include "md.h"
 #include "verlet.h"
 
-#define INPUT
+#define CUBE
 //initializing stuff
 int main(){	
 	#ifdef CUBE
-	double L = 100; //length of one side of the box
-	int N_core = 3; // number of particles per side in a cubic lattice thing.
+	double L = 7; //length of one side of the box
+	int N_core = 5; // number of particles per side in a cubic lattice thing.
 	int N = N_core*N_core*N_core;
-	int testPart = 0;
+	int testPart = 20;
 	#endif
 	#ifdef INPUT
 	FILE *fp;
@@ -67,16 +67,24 @@ int main(){
 	
 	#ifdef CUBE
 	//cube stuff
+	srand (time(NULL));//seed time
 	
 	for(int i = 0; i<N; i++){	
-		double ran = 0;//for now keep velocity 0
+		double ran = 0.0001;//for now keep velocity 0
 		past[i][0] = (i%N_core)*L/N_core;
 		past[i][1] = ((i/N_core)%N_core)*L/N_core;
 		past[i][2] = ((i/(N_core*N_core))%N_core)*L/N_core;
 		//in our case, start with slightly randomized velocity, nothing too fancy
-		state[i][0] = past[i][0]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
-		state[i][1] = past[i][1]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
-		state[i][2] = past[i][2]+(ran*L*(rand()-0.5)/(double)RAND_MAX);
+		state[i][0] = past[i][0]+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		state[i][1] = past[i][1]+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		state[i][2] = past[i][2]+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		//enforce pbc on state vectors:		
+		for(int j = 0; j<3; j++){
+			if(state[i][j]<0 || state[i][j]>=L){
+				state[i][j] = state[i][j] - L*floor(state[i][j]/L); //enforce pbc
+			}
+		}
+		
 	}
 	#endif	
 	printf("%lf %lf %lf %lf \n",0.00,state[testPart][0],state[testPart][1],state[testPart][2]);
