@@ -10,7 +10,7 @@ void verletengine(double **state, double **past, int N, double L){
 	int steps = 10000; //number of steps to simulate
 	double mass = 39.948;
 	srand(time(NULL));
-	int testPart = 0;
+	int testPart = 1;
 	double kb = 0.00831;
 	double temp = 298;
 	double epsilon = 120*kb*temp;
@@ -55,7 +55,7 @@ void vv(double **state, double **velocity, int N, double L){
 	int steps = 10000; //number of steps to simulate
 	double mass = 39.948;
 	srand(time(NULL));
-	int testPart = 0;
+	int testPart = 1;
 	double kb = 0.00831;
 	double temp = 298;
 	double epsilon = 120*kb*temp;
@@ -81,7 +81,7 @@ void vv(double **state, double **velocity, int N, double L){
 		
 		for(int i=0; i<N; i++){
 			past[i] = malloc(3*sizeof(double));//this matrix keeps track of past accelerations
-			for (int j=0; j<N; j++){
+			for (int j=0; j<3; j++){
 				past[i][j] = state[i][j+3];//set the past 
 				state[i][j+3] = 0;//zero out forces while at it
 			}
@@ -93,8 +93,10 @@ void vv(double **state, double **velocity, int N, double L){
 			velocity[i][j] += 0.5*deltat*(state[i][j+3]+past[i][j])/mass;
 			temp += 0.5*mass*velocity[i][j]*velocity[i][j];//adds kinetic energy
 			}
+			free(past[i]);
 		}
-		temp /= (3/2)*N*kb;
+		free(past);
+		temp = temp/((3/2)*N*kb);
 		t += deltat;
 		if(step%100 ==99){
 		printf("%f %f %f %f %f %f\n",t,state[testPart][0],state[testPart][1],state[testPart][2],temp,p);

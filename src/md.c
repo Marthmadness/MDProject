@@ -2,10 +2,12 @@
 #include "verlet.h"
 
 #define CUBE
+#define VV
+
 //initializing stuff
 int main(){	
 	#ifdef CUBE
-	double L = 7; //length of one side of the box
+	double L = 10; //length of one side of the box
 	int N_core = 5; // number of particles per side in a cubic lattice thing.
 	int N = N_core*N_core*N_core;
 	int testPart = 20;
@@ -68,9 +70,9 @@ int main(){
 	#ifdef CUBE
 	//cube stuff
 	srand (time(NULL));//seed time
-	
+	#ifndef VV
 	for(int i = 0; i<N; i++){	
-		double ran = 0.0001;//for now keep velocity 0
+		double ran = 0.0;//for now keep velocity 0
 		past[i][0] = (i%N_core)*L/N_core;
 		past[i][1] = ((i/N_core)%N_core)*L/N_core;
 		past[i][2] = ((i/(N_core*N_core))%N_core)*L/N_core;
@@ -86,14 +88,36 @@ int main(){
 		}
 		
 	}
+	#endif
+	#ifdef VV
+	for(int i = 0; i<N; i++){	
+		double ran = 0;//for now keep velocity 0
+		past[i][0] = 0;
+		past[i][1] = 0;
+		past[i][2] = 0;
+		state[i][0] = (i%N_core)*L/N_core+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		state[i][1] = ((i/N_core)%N_core)*L/N_core+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		state[i][2] = ((i/(N_core*N_core))%N_core)*L/N_core+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		//enforce pbc on state vectors:		
+		for(int j = 0; j<3; j++){
+			if(state[i][j]<0 || state[i][j]>=L){
+				state[i][j] = state[i][j] - L*floor(state[i][j]/L); //enforce pbc
+			}
+		}
+	}
+	#endif
 	#endif	
 	printf("%lf %lf %lf %lf \n",0.00,state[testPart][0],state[testPart][1],state[testPart][2]);
-		
+	#ifndef VV	
 	verletengine(state, past, N, L);
+	#endif
+	#ifdef VV
+	vv(state, past, N,L);
+	#endif
 	for(int i=0; i<N; i++){
 		free(state[i]);
 		free(past[i]);
-		}
+	}
 	free(state);
 	free(past);
 	return 0;

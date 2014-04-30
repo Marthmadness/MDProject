@@ -28,5 +28,5 @@ void lj_full(double **state, int N, double L, double epsilon, double sigma, doub
 	//printf("%lf %lf %lf \n", state[1][3], state[1][4], state[1][5]);
 }
 double force(double rij2, double epsilon, double sigma){
-return -24*epsilon/(rij2) * (2*(pow(sigma,12)/(pow(rij2,6))) - (pow(sigma,6)/pow(rij2,3)));
+return (-24*epsilon/(rij2) * (2*(pow(sigma,12)/(pow(rij2,6))) - (pow(sigma,6)/pow(rij2,3))));
 }
