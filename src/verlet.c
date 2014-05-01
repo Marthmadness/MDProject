@@ -13,7 +13,7 @@ void verletengine(double **state, double **past, int N, double L){
 	int testPart = 1;
 	double kb = 0.00831;
 	double temp = 298;
-	double epsilon = 120*kb*temp;
+	double epsilon = 120*kb;
 	double sigma = 0.34;
 
 	//begin the loop of the simulation
@@ -28,7 +28,6 @@ void verletengine(double **state, double **past, int N, double L){
 		double p = 0;
 		lj_full(state, N, L, epsilon, sigma, &p);
 		//now integrate with respect to time! Verlet style!
-		p = p + (N/(L*L*L))*kb*temp;
 		double temp = 0.0;
 		for(int i=0; i<N; i++){
 				for(int j=0; j<3; j++){
@@ -44,6 +43,7 @@ void verletengine(double **state, double **past, int N, double L){
 			}
 			
 		t += deltat;
+		p = p + (N/(L*L*L))*kb*temp;
 		if(step%100 ==99){
 		printf("%f %f %f %f %f\n",t,state[testPart][0],state[testPart][1],state[testPart][2],p);
 		}		
@@ -78,7 +78,7 @@ void vv(double **state, double **velocity, int N, double L){
 		past = malloc(N*sizeof(double *));
 		
 		for(int i=0; i<N; i++){
-			past[i] = malloc(3*sizeof(double));//this matrix keeps track of past accelerations
+			past[i] = malloc(3*sizeof(double));//this matrix keeps track of past forces
 			for (int j=0; j<3; j++){
 				past[i][j] = state[i][j+3];//set the past 
 				state[i][j+3] = 0;//zero out forces while at it

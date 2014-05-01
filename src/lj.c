@@ -38,3 +38,10 @@ double sigma6 = sigma*sigma*sigma*sigma*sigma*sigma;
 double sigma12 = sigma6*sigma6;
 return (-24*epsilon/(rij2) * (2*(sigma12/r12) - (sigma6/r6)));
 }
+double force_cutoff(double rij2, double epsilon, double sigma){
+double r6 = rij2*rij2*rij2;
+double r12 = r6*r6;
+double sigma6 = sigma*sigma*sigma*sigma*sigma*sigma;
+double sigma12 = sigma6*sigma6;
+return ((-24*epsilon/(rij2) * (2*(sigma12/r12) - (sigma6/r6)))+force(2.5*sigma,epsilon,sigma));
+}
