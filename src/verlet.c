@@ -51,19 +51,17 @@ void verletengine(double **state, double **past, int N, double L){
 }
 void vv(double **state, double **velocity, int N, double L){
 	double t = 0; //initial time is 0
-	double deltat = 0.001;// timestep
-	int steps = 10000; //number of steps to simulate
+	double deltat = 0.0001;// timestep
+	int steps = 1; //number of steps to simulate
 	double mass = 39.948;
 	srand(time(NULL));
-	int testPart = 1;
+	int testPart = 3;
 	double kb = 0.00831;
-	double temp = 298;
-	double epsilon = 120*kb*temp;
+	double epsilon = 120*kb;
 	double sigma = 0.34;
 	double p = 0;
 	//perform initial force calculations
 	lj_full(state, N, L, epsilon, sigma, &p);
-	p = p + (N/(L*L*L))*kb*temp;
 	//begin the loop of the simulation
 	for(int step=0; step<steps; step++){
 		//velocity verlet
@@ -86,10 +84,11 @@ void vv(double **state, double **velocity, int N, double L){
 				state[i][j+3] = 0;//zero out forces while at it
 			}
 		}
+		p = 0;
 		lj_full(state, N, L, epsilon, sigma, &p);//compute forces
 		double temp = 0;
 		for(int i=0; i<N; i++){
-			for (int j=0; j<N; j++){
+			for (int j=0; j<3; j++){
 			velocity[i][j] += 0.5*deltat*(state[i][j+3]+past[i][j])/mass;
 			temp += 0.5*mass*velocity[i][j]*velocity[i][j];//adds kinetic energy
 			}
@@ -98,8 +97,9 @@ void vv(double **state, double **velocity, int N, double L){
 		free(past);
 		temp = temp/((3/2)*N*kb);
 		t += deltat;
+		p = p + (N/(L*L*L))*kb*temp;
 		if(step%100 ==99){
-		printf("%f %f %f %f %f %f\n",t,state[testPart][0],state[testPart][1],state[testPart][2],temp,p);
+		printf("%f %f %f %f %f %f\n",t,velocity[testPart][0],velocity[testPart][1],velocity[testPart][2],temp,p);
 		}		
 	}
 }

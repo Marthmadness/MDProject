@@ -1,7 +1,7 @@
 #include "md.h"
 #include "verlet.h"
 
-#define CUBE
+#define INPUT
 #define VV
 
 //initializing stuff
@@ -10,7 +10,7 @@ int main(){
 	double L = 10; //length of one side of the box
 	int N_core = 5; // number of particles per side in a cubic lattice thing.
 	int N = N_core*N_core*N_core;
-	int testPart = 20;
+	int testPart = 2;
 	#endif
 	#ifdef INPUT
 	FILE *fp;
@@ -59,11 +59,14 @@ int main(){
 				state[i][j] = state[i][j] - L*floor(state[i][j]/L); //enforce pbc
 			}
 		}
-		past[i][0] = state[i][0];
-		past[i][1] = state[i][1];
-		past[i][2] = state[i][2];
+		past[i][0] = 0;
+		past[i][1] = 0;
+		past[i][2] = 0;
+		state[i][3] = 0;
+		state[i][4] = 0;
+		state[i][5] = 0;		
 	}
-	int testPart = N-1;
+	int testPart = 0;
 	fclose(fp);
 	#endif
 	
@@ -80,6 +83,9 @@ int main(){
 		state[i][0] = past[i][0]+(ran*L*((rand()/(double)RAND_MAX)-0.5));
 		state[i][1] = past[i][1]+(ran*L*((rand()/(double)RAND_MAX)-0.5));
 		state[i][2] = past[i][2]+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		state[i][3] = 0;
+		state[i][4] = 0;
+		state[i][5] = 0;
 		//enforce pbc on state vectors:		
 		for(int j = 0; j<3; j++){
 			if(state[i][j]<0 || state[i][j]>=L){
@@ -91,19 +97,23 @@ int main(){
 	#endif
 	#ifdef VV
 	for(int i = 0; i<N; i++){	
-		double ran = 0;//for now keep velocity 0
+		double ran = 0.2;//for now keep velocity 0
 		past[i][0] = 0;
 		past[i][1] = 0;
 		past[i][2] = 0;
 		state[i][0] = (i%N_core)*L/N_core+(ran*L*((rand()/(double)RAND_MAX)-0.5));
 		state[i][1] = ((i/N_core)%N_core)*L/N_core+(ran*L*((rand()/(double)RAND_MAX)-0.5));
 		state[i][2] = ((i/(N_core*N_core))%N_core)*L/N_core+(ran*L*((rand()/(double)RAND_MAX)-0.5));
+		state[i][3] = 0;
+		state[i][4] = 0;
+		state[i][5] = 0;
 		//enforce pbc on state vectors:		
 		for(int j = 0; j<3; j++){
 			if(state[i][j]<0 || state[i][j]>=L){
 				state[i][j] = state[i][j] - L*floor(state[i][j]/L); //enforce pbc
 			}
 		}
+		//printf("%f %f %f \n", state[i][0], state[i][1], state[i][2]);
 	}
 	#endif
 	#endif	
