@@ -9,16 +9,15 @@ void lj_full(double **state, int N, double L, double epsilon, double sigma, doub
 			double rij[3];
 			double rij2 = 0;
 			for(int k=0; k<3; k++){
-				rij[k] = state[j][k] - state[i][k]; 
-				if(abs(rij[k]) > 0.5*L){
-					rij[k] = (L - abs(rij[k]))*((rij[k] < 0) - (rij[k] > 0));//minimum image convention, requires that the particles are inside the cube
+				rij[k] = state[j][k] - state[i][k];
+				//printf("%lf AHHHHH  %lf\n", rij[k], fabs(rij[k]));
+				if(fabs(rij[k]) > (0.5*L)){
+					rij[k] = (L - fabs(rij[k]))*((rij[k] < 0) - (rij[k] > 0));//minimum image convention, requires that the particles are inside the cube
 				}
 				rij2 += rij[k]*rij[k];
 			}
-			test = rij2;
 			double mag = 0;
-			mag = force(rij2, epsilon, sigma);
-			test2 = mag;
+			mag = force_cutoff(rij2, epsilon, sigma);
 			//now update each component of the force
 			for(int k=3; k<6; k++){
 				state[i][k] += mag*rij[k-3];
@@ -29,7 +28,7 @@ void lj_full(double **state, int N, double L, double epsilon, double sigma, doub
 	}
 	*p = pressure/(3*L*L*L);
 	int x = 0;
-	printf("%lf %lf %lf %lf %lf \n", state[x][3], state[x][4], state[x][5], test, test2);
+	//printf("%lf %lf %lf %lf %lf \n", state[x][3], state[x][4], state[x][5], test, test2);
 }
 double force(double rij2, double epsilon, double sigma){
 double r6 = rij2*rij2*rij2;
